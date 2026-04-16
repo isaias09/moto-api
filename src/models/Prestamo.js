@@ -21,7 +21,7 @@ const PrestamoSchema = new mongoose.Schema({
     enum: ['personal','hipotecario','vehicular','comercial','empresarial','educativo','con_garantia','sin_garantia'],
     required: true,
   },
-  tipoCalculo:         { type: String, enum: ['frances','simple','aleman'], default: 'frances' },
+  tipoCalculo: { type: String, enum: ['frances','simple','aleman','bullet'], default: 'frances' },
   descripcionDestino:  { type: String, required: true },
   tieneGarantia:       { type: Boolean, default: false },
   tipoGarantia:        { type: String, default: 'ninguna' },
