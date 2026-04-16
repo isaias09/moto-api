@@ -9,6 +9,7 @@ app.options('*', cors());
 app.use(express.json({ limit: '10mb' }));
 
 app.use('/api/auth',       require('../src/routes/auth'));
+app.use('/api/empresa',   require('../src/routes/empresa'));
 app.use('/api/clientes',  require('../src/routes/clientes'));
 app.use('/api/prestamos', require('../src/routes/prestamos'));
 app.use('/api/pagos',     require('../src/routes/pagos'));

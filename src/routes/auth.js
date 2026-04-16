@@ -1,6 +1,7 @@
-const router = require('express').Router();
-const jwt = require('jsonwebtoken');
+const router  = require('express').Router();
+const jwt     = require('jsonwebtoken');
 const Usuario = require('../models/Usuario');
+const Empresa = require('../models/Empresa');
 
 // POST /api/auth/login
 router.post('/login', async (req, res) => {
@@ -18,6 +19,12 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Credenciales incorrectas' });
 
     await Usuario.findByIdAndUpdate(usuario._id, { lastLogin: new Date() });
+
+    // Cargar config de la empresa si el usuario pertenece a una
+    let empresa = null;
+    if (usuario.empresaId) {
+      empresa = await Empresa.findById(usuario.empresaId).select('nombre rnc telefono direccion email config activa');
+    }
 
     const token = jwt.sign(
       {
@@ -42,6 +49,15 @@ router.post('/login', async (req, res) => {
         empresaId:    usuario.empresaId ?? null,
         esSuperAdmin: usuario.esSuperAdmin ?? false,
       },
+      empresa: empresa ? {
+        id:        empresa._id,
+        nombre:    empresa.nombre,
+        rnc:       empresa.rnc,
+        telefono:  empresa.telefono,
+        direccion: empresa.direccion,
+        email:     empresa.email,
+        config:    empresa.config,
+      } : null,
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
