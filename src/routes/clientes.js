@@ -1,14 +1,14 @@
 const router = require('express').Router();
 const auth = require('../middleware/auth');
+const empresa = require('../middleware/empresa');
 const Cliente = require('../models/Cliente');
 
-router.use(auth);
+router.use(auth, empresa);
 
-// GET /api/clientes
 router.get('/', async (req, res) => {
   try {
     const { q } = req.query;
-    const filter = { activo: true };
+    const filter = { empresaId: req.empresaId, activo: true };
     if (q) {
       filter.$or = [
         { nombre: new RegExp(q, 'i') },
@@ -22,36 +22,38 @@ router.get('/', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// GET /api/clientes/:id
 router.get('/:id', async (req, res) => {
   try {
-    const cliente = await Cliente.findById(req.params.id);
+    const cliente = await Cliente.findOne({ _id: req.params.id, empresaId: req.empresaId });
     if (!cliente) return res.status(404).json({ error: 'No encontrado' });
     res.json(cliente);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// POST /api/clientes
 router.post('/', async (req, res) => {
   try {
-    const cliente = new Cliente(req.body);
+    const cliente = new Cliente({ ...req.body, empresaId: req.empresaId });
     await cliente.save();
     res.status(201).json(cliente);
   } catch (err) { res.status(400).json({ error: err.message }); }
 });
 
-// PUT /api/clientes/:id
 router.put('/:id', async (req, res) => {
   try {
-    const cliente = await Cliente.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const cliente = await Cliente.findOneAndUpdate(
+      { _id: req.params.id, empresaId: req.empresaId },
+      req.body, { new: true },
+    );
     res.json(cliente);
   } catch (err) { res.status(400).json({ error: err.message }); }
 });
 
-// DELETE /api/clientes/:id (soft delete)
 router.delete('/:id', async (req, res) => {
   try {
-    await Cliente.findByIdAndUpdate(req.params.id, { activo: false });
+    await Cliente.findOneAndUpdate(
+      { _id: req.params.id, empresaId: req.empresaId },
+      { activo: false },
+    );
     res.json({ ok: true });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });

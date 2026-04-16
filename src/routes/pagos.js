@@ -1,15 +1,16 @@
 const router = require('express').Router();
 const auth   = require('../middleware/auth');
+const empresaMw = require('../middleware/empresa');
 const Pago   = require('../models/Pago');
 const Prestamo = require('../models/Prestamo');
 
-router.use(auth);
+router.use(auth, empresaMw);
 
 // GET /api/pagos
 router.get('/', async (req, res) => {
   try {
     const { fecha, prestamoId } = req.query;
-    const filter = {};
+    const filter = { empresaId: req.empresaId };
     if (prestamoId) filter.prestamoId = prestamoId;
     if (fecha) {
       const inicio = new Date(fecha);
@@ -151,6 +152,7 @@ router.post('/', async (req, res) => {
     const numeroPago = `PAG-${year}-${String(count + 1).padStart(5, '0')}`;
 
     const pago = await Pago.create({
+      empresaId:      req.empresaId,
       prestamoId,
       clienteId:      prestamo.clienteId,
       usuarioId:      req.usuario.id,

@@ -13,6 +13,7 @@ const CuotaSchema = new mongoose.Schema({
 }, { _id: true });
 
 const PrestamoSchema = new mongoose.Schema({
+  empresaId: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
   clienteId:           { type: mongoose.Schema.Types.ObjectId, ref: 'Cliente', required: true },
   usuarioId:           { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario', required: true },
   numeroPrestamo:      { type: String, required: true, unique: true },

@@ -20,7 +20,14 @@ router.post('/login', async (req, res) => {
     await Usuario.findByIdAndUpdate(usuario._id, { lastLogin: new Date() });
 
     const token = jwt.sign(
-      { id: usuario._id, email: usuario.email, rol: usuario.rol, nombre: usuario.nombre },
+      {
+        id:           usuario._id,
+        email:        usuario.email,
+        rol:          usuario.rol,
+        nombre:       usuario.nombre,
+        empresaId:    usuario.empresaId ?? null,
+        esSuperAdmin: usuario.esSuperAdmin ?? false,
+      },
       process.env.JWT_SECRET,
       { expiresIn: '24h' },
     );
@@ -28,10 +35,12 @@ router.post('/login', async (req, res) => {
     res.json({
       token,
       usuario: {
-        id: usuario._id,
-        nombre: usuario.nombre,
-        email: usuario.email,
-        rol: usuario.rol,
+        id:           usuario._id,
+        nombre:       usuario.nombre,
+        email:        usuario.email,
+        rol:          usuario.rol,
+        empresaId:    usuario.empresaId ?? null,
+        esSuperAdmin: usuario.esSuperAdmin ?? false,
       },
     });
   } catch (err) {

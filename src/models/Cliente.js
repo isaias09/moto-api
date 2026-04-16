@@ -7,6 +7,7 @@ const ReferenciaSchema = new mongoose.Schema({
 }, { _id: false });
 
 const ClienteSchema = new mongoose.Schema({
+  empresaId: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
   nombre:        { type: String, required: true },
   apellido:      { type: String, required: true },
   cedula:        { type: String, required: true, unique: true },

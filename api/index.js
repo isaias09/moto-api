@@ -8,12 +8,13 @@ app.use(cors({ origin: '*', methods: ['GET','POST','PUT','DELETE','OPTIONS'], al
 app.options('*', cors());
 app.use(express.json({ limit: '10mb' }));
 
-app.use('/api/auth',      require('../src/routes/auth'));
+app.use('/api/auth',       require('../src/routes/auth'));
 app.use('/api/clientes',  require('../src/routes/clientes'));
 app.use('/api/prestamos', require('../src/routes/prestamos'));
 app.use('/api/pagos',     require('../src/routes/pagos'));
 app.use('/api/usuarios',  require('../src/routes/usuarios'));
 app.use('/api/reportes',  require('../src/routes/reportes'));
+app.use('/api/superadmin',require('../src/routes/superadmin'));
 app.get('/',           (_, res) => res.json({ app: 'FinanceRD API', v: '1.0.0' }));
 app.get('/api/health', (_, res) => res.json({ ok: true, time: new Date() }));
 

@@ -14,12 +14,13 @@ app.options('*', cors()); // preflight
 app.use(express.json({ limit: '10mb' }));
 
 // Rutas
-app.use('/api/auth',      require('./routes/auth'));
+app.use('/api/auth',       require('./routes/auth'));
 app.use('/api/clientes',  require('./routes/clientes'));
 app.use('/api/prestamos', require('./routes/prestamos'));
 app.use('/api/pagos',     require('./routes/pagos'));
 app.use('/api/usuarios',  require('./routes/usuarios'));
 app.use('/api/reportes',  require('./routes/reportes'));
+app.use('/api/superadmin',require('./routes/superadmin'));
 
 app.get('/',          (_, res) => res.json({ app: 'FinanceRD API', version: '1.0.0' }));
 app.get('/api/health',(_, res) => res.json({ ok: true, time: new Date() }));

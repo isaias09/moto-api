@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 const UsuarioSchema = new mongoose.Schema({
+  empresaId: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', default: null },
+  esSuperAdmin: { type: Boolean, default: false },
   nombre:    { type: String, required: true },
   email:     { type: String, required: true, unique: true, lowercase: true },
   password:  { type: String, required: true },
