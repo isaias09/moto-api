@@ -4,13 +4,12 @@
  */
 module.exports = function (req, res, next) {
   if (req.usuario.esSuperAdmin) {
-    // SuperAdmin puede operar en cualquier empresa
     req.empresaId = req.query.empresaId || req.body.empresaId || null;
   } else {
     req.empresaId = req.usuario.empresaId;
   }
 
-  if (!req.empresaId && !req.usuario.esSuperAdmin) {
+  if (!req.empresaId) {
     return res.status(403).json({ error: 'Sin empresa asignada' });
   }
   next();

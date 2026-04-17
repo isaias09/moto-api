@@ -39,10 +39,12 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    const count = await Prestamo.countDocuments({ empresaId: req.empresaId });
+    const empresaId = req.empresaId || req.body.empresaId;
+    if (!empresaId) return res.status(403).json({ error: 'Sin empresa asignada' });
+    const count = await Prestamo.countDocuments({ empresaId });
     const year  = new Date().getFullYear();
     const numeroPrestamo = `PRE-${year}-${String(count + 1).padStart(4, '0')}`;
-    const prestamo = new Prestamo({ ...req.body, empresaId: req.empresaId, numeroPrestamo, usuarioId: req.usuario.id });
+    const prestamo = new Prestamo({ ...req.body, empresaId, numeroPrestamo, usuarioId: req.usuario.id });
     await prestamo.save();
     res.status(201).json(prestamo);
   } catch (err) { res.status(400).json({ error: err.message }); }
