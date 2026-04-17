@@ -16,7 +16,7 @@ const PrestamoSchema = new mongoose.Schema({
   empresaId: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
   clienteId:           { type: mongoose.Schema.Types.ObjectId, ref: 'Cliente', required: true },
   usuarioId:           { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario', required: true },
-  numeroPrestamo:      { type: String, required: true, unique: true },
+  numeroPrestamo:      { type: String, required: true },
   tipoPrestamo:        {
     type: String,
     enum: ['personal','hipotecario','vehicular','comercial','empresarial','educativo','con_garantia','sin_garantia'],
@@ -52,5 +52,8 @@ const PrestamoSchema = new mongoose.Schema({
   montoMoraAcumulada:  { type: Number, default: 0 },
   observaciones:       String,
 }, { timestamps: true });
+
+// Único por empresa — dos empresas pueden tener PRE-2026-0001
+PrestamoSchema.index({ empresaId: 1, numeroPrestamo: 1 }, { unique: true });
 
 module.exports = mongoose.model('Prestamo', PrestamoSchema);
