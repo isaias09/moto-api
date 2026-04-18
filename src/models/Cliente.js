@@ -10,7 +10,7 @@ const ClienteSchema = new mongoose.Schema({
   empresaId: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
   nombre:        { type: String, required: true },
   apellido:      { type: String, required: true },
-  cedula:        { type: String, required: true, unique: true },
+  cedula:        { type: String, required: true },
   telefono:      { type: String, required: true },
   telefonoAlt:   String,
   email:         String,
@@ -23,5 +23,8 @@ const ClienteSchema = new mongoose.Schema({
   documentos:    [String],
   activo:        { type: Boolean, default: true },
 }, { timestamps: true });
+
+// Cédula única por empresa — la misma persona puede ser cliente en empresas distintas
+ClienteSchema.index({ empresaId: 1, cedula: 1 }, { unique: true });
 
 module.exports = mongoose.model('Cliente', ClienteSchema);
