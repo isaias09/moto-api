@@ -24,6 +24,9 @@ router.post('/login', async (req, res) => {
     let empresa = null;
     if (usuario.empresaId) {
       empresa = await Empresa.findById(usuario.empresaId).select('nombre rnc telefono direccion email config activa');
+      if (!empresa || !empresa.activa) {
+        return res.status(403).json({ error: 'Empresa inactiva. Contacte al administrador del sistema.' });
+      }
     }
 
     const token = jwt.sign(
