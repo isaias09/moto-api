@@ -15,13 +15,13 @@ npm install
 
 ```env
 PORT=3000
-MONGODB_URI=mongodb://localhost:27017/financerd
-JWT_SECRET=financerd_secret_2024
+MONGODB_URI=mongodb://localhost:8081/BD
+JWT_SECRET=*********
 ```
 
 ### Si usas MongoDB Atlas (cloud):
 ```env
-MONGODB_URI=mongodb+srv://<usuario>:<password>@cluster0.xxxxx.mongodb.net/financerd
+MONGODB_URI=mongodb+srv://<usuario>:<password>@cluster0.xxxxx.mongodb.net/BD
 ```
 
 ## Crear usuario admin
