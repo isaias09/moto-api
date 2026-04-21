@@ -44,7 +44,19 @@ router.post('/', async (req, res) => {
     const count = await Prestamo.countDocuments({ empresaId });
     const year  = new Date().getFullYear();
     const numeroPrestamo = `PRE-${year}-${String(count + 1).padStart(4, '0')}`;
-    const prestamo = new Prestamo({ ...req.body, empresaId, numeroPrestamo, usuarioId: req.usuario.id });
+
+    // Sanitizar campos numéricos — evitar NaN
+    const body = { ...req.body };
+    const numFields = ['montoSolicitado','inicial','montoFinanciado','tasaInteres',
+      'tasaMoraDiaria','plazoMeses','totalCuotas','montoCuota','totalIntereses',
+      'totalPagar','saldoPendiente','capitalPagado','interesesPagados',
+      'cuotasPagadas','cuotasVencidas','diasMora','montoMoraAcumulada'];
+    for (const f of numFields) {
+      const v = Number(body[f]);
+      body[f] = isNaN(v) ? 0 : v;
+    }
+
+    const prestamo = new Prestamo({ ...body, empresaId, numeroPrestamo, usuarioId: req.usuario.id });
     await prestamo.save();
     res.status(201).json(prestamo);
   } catch (err) { res.status(400).json({ error: err.message }); }
