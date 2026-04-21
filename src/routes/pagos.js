@@ -51,9 +51,12 @@ router.post('/', async (req, res) => {
 
     // ── SOLO INTERÉS ──────────────────────────────────────────────────────────
     if (prestamo.tipoCalculo === 'solo_interes') {
-      const capitalActual = prestamo.saldoPendiente;
-      const abono         = Number(abonoCapital || 0);
-      const tp            = prestamo.tasaInteres / 100 / (
+      // Usar montoFinanciado como fallback si saldoPendiente es NaN
+      const capitalActual = isNaN(prestamo.saldoPendiente) || prestamo.saldoPendiente == null
+        ? (prestamo.montoFinanciado || 0)
+        : prestamo.saldoPendiente;
+      const abono = Number(abonoCapital || 0);
+      const tp    = prestamo.tasaInteres / 100 / (
         prestamo.frecuenciaPago === 'diario'    ? 30 :
         prestamo.frecuenciaPago === 'semanal'   ? 4  :
         prestamo.frecuenciaPago === 'quincenal' ? 2  : 1
@@ -139,11 +142,11 @@ router.post('/', async (req, res) => {
     prestamo.cuotas           = cuotasFinales;
     prestamo.cuotasPagadas    = cuotasPagadasCount;
     prestamo.cuotasVencidas   = cuotasVencidasCount;
-    prestamo.saldoPendiente   = Math.max(0, Math.round(nuevoSaldo * 100) / 100);
+    prestamo.saldoPendiente   = isNaN(nuevoSaldo) ? 0 : Math.max(0, Math.round(nuevoSaldo * 100) / 100);
     prestamo.diasMora         = diasMora;
     prestamo.estado           = estadoPrestamo;
-    prestamo.capitalPagado    = Math.round(((prestamo.capitalPagado    || 0) + totalCapital) * 100) / 100;
-    prestamo.interesesPagados = Math.round(((prestamo.interesesPagados || 0) + totalInteres) * 100) / 100;
+    prestamo.capitalPagado    = Math.round(((prestamo.capitalPagado    || 0) + (isNaN(totalCapital) ? 0 : totalCapital)) * 100) / 100;
+    prestamo.interesesPagados = Math.round(((prestamo.interesesPagados || 0) + (isNaN(totalInteres) ? 0 : totalInteres)) * 100) / 100;
     await prestamo.save();
 
     // ── Registro de pago ──────────────────────────────────────────────────────
