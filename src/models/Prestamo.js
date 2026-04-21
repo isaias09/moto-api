@@ -53,6 +53,18 @@ const PrestamoSchema = new mongoose.Schema({
   observaciones:       String,
 }, { timestamps: true });
 
+// Sanitizar NaN antes de guardar
+PrestamoSchema.pre('save', function(next) {
+  const numFields = ['montoSolicitado','inicial','montoFinanciado','tasaInteres',
+    'tasaMoraDiaria','plazoMeses','totalCuotas','montoCuota','totalIntereses',
+    'totalPagar','saldoPendiente','capitalPagado','interesesPagados',
+    'cuotasPagadas','cuotasVencidas','diasMora','montoMoraAcumulada'];
+  for (const f of numFields) {
+    if (isNaN(this[f])) this[f] = 0;
+  }
+  next();
+});
+
 // Único por empresa — dos empresas pueden tener PRE-2026-0001
 PrestamoSchema.index({ empresaId: 1, numeroPrestamo: 1 }, { unique: true });
 
