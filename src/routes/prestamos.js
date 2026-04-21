@@ -47,6 +47,7 @@ router.post('/', async (req, res) => {
 
     // Sanitizar campos numéricos — evitar NaN
     const body = { ...req.body };
+    console.log('[POST /prestamos] saldoPendiente recibido:', body.saldoPendiente, typeof body.saldoPendiente);
     const numFields = ['montoSolicitado','inicial','montoFinanciado','tasaInteres',
       'tasaMoraDiaria','plazoMeses','totalCuotas','montoCuota','totalIntereses',
       'totalPagar','saldoPendiente','capitalPagado','interesesPagados',
@@ -55,6 +56,7 @@ router.post('/', async (req, res) => {
       const v = Number(body[f]);
       body[f] = isNaN(v) ? 0 : v;
     }
+    console.log('[POST /prestamos] saldoPendiente sanitizado:', body.saldoPendiente);
 
     const prestamo = new Prestamo({ ...body, empresaId, numeroPrestamo, usuarioId: req.usuario.id });
     await prestamo.save();
