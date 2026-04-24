@@ -110,21 +110,22 @@ router.post('/empresas/:id/usuarios', async (req, res) => {
     const empresa = await Empresa.findById(empresaId).select('plan limites nombre');
     if (!empresa) return res.status(404).json({ error: 'Empresa no encontrada' });
 
-    const LIMITES = {
-      basico:      3,
-      profesional: 10,
-      enterprise:  999,
-    };
-    const maxUsuarios = empresa.limites?.maxUsuarios ?? LIMITES[empresa.plan] ?? 3;
-    const actual      = await Usuario.countDocuments({ empresaId, activo: true });
+    const LIMITES_POR_PLAN = { basico: 3, profesional: 10, enterprise: 999 };
+    const plan        = empresa.plan ?? 'basico';
+    const maxUsuarios = (empresa.limites?.maxUsuarios > 0)
+      ? empresa.limites.maxUsuarios
+      : (LIMITES_POR_PLAN[plan] ?? 3);
+    const actual = await Usuario.countDocuments({ empresaId, activo: true });
+
+    console.log(`[superadmin/usuarios] empresa="${empresa.nombre}" plan=${plan} actual=${actual} max=${maxUsuarios}`);
 
     if (actual >= maxUsuarios) {
       return res.status(403).json({
-        error: `Límite del plan alcanzado: máximo ${maxUsuarios} usuarios (plan ${empresa.plan}). Actualiza el plan de "${empresa.nombre}" para continuar.`,
+        error: `Límite del plan alcanzado: máximo ${maxUsuarios} usuarios (plan ${plan}). Actualiza el plan de "${empresa.nombre}" para continuar.`,
         codigo: 'LIMITE_PLAN',
         actual,
         maximo: maxUsuarios,
-        plan: empresa.plan,
+        plan,
       });
     }
 
