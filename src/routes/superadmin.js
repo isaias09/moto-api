@@ -104,7 +104,35 @@ router.get('/empresas/:id/usuarios', async (req, res) => {
 
 router.post('/empresas/:id/usuarios', async (req, res) => {
   try {
-    const usuario = new Usuario({ ...req.body, empresaId: req.params.id });
+    const empresaId = req.params.id;
+
+    // Verificar límite del plan
+    const empresa = await Empresa.findById(empresaId).select('plan limites nombre');
+    if (!empresa) return res.status(404).json({ error: 'Empresa no encontrada' });
+
+    const LIMITES = {
+      basico:      3,
+      profesional: 10,
+      enterprise:  999,
+    };
+    const maxUsuarios = empresa.limites?.maxUsuarios ?? LIMITES[empresa.plan] ?? 3;
+    const actual      = await Usuario.countDocuments({ empresaId, activo: true });
+
+    if (actual >= maxUsuarios) {
+      return res.status(403).json({
+        error: `Límite del plan alcanzado: máximo ${maxUsuarios} usuarios (plan ${empresa.plan}). Actualiza el plan de "${empresa.nombre}" para continuar.`,
+        codigo: 'LIMITE_PLAN',
+        actual,
+        maximo: maxUsuarios,
+        plan: empresa.plan,
+      });
+    }
+
+    // Verificar email único en la empresa
+    const existe = await Usuario.findOne({ email: req.body.email?.toLowerCase(), empresaId });
+    if (existe) return res.status(400).json({ error: 'Ya existe un usuario con ese email en esta empresa' });
+
+    const usuario = new Usuario({ ...req.body, empresaId });
     await usuario.save();
     const { password, ...data } = usuario.toObject();
     res.status(201).json(data);
