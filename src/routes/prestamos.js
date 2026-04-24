@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const auth    = require('../middleware/auth');
 const empresa = require('../middleware/empresa');
+const verificarLimite = require('../middleware/plan');
 const Prestamo = require('../models/Prestamo');
 
 router.use(auth, empresa);
@@ -37,7 +38,7 @@ router.get('/:id', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', verificarLimite('prestamos'), async (req, res) => {
   try {
     const empresaId = req.empresaId || req.body.empresaId;
     if (!empresaId) return res.status(403).json({ error: 'Sin empresa asignada' });

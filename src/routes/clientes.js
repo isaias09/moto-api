@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const auth = require('../middleware/auth');
 const empresa = require('../middleware/empresa');
+const verificarLimite = require('../middleware/plan');
 const Cliente = require('../models/Cliente');
 
 router.use(auth, empresa);
@@ -30,7 +31,7 @@ router.get('/:id', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', verificarLimite('clientes'), async (req, res) => {
   try {
     const cliente = new Cliente({ ...req.body, empresaId: req.empresaId });
     await cliente.save();
